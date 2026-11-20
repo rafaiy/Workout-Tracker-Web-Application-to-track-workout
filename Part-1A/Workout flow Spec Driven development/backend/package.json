@@ -1,0 +1,19 @@
+{
+  "name": "workout-tracker-backend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "coverage:services": "c8 --all --include src/modules/sessions/session.service.js --check-coverage --lines 85 node --test",
+    "coverage:validators": "c8 --all --include src/modules/sessions/session.validation.js --check-coverage --lines 85 node --test",
+    "coverage": "npm run coverage:services && npm run coverage:validators"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "c8": "^12.0.0"
+  }
+}

@@ -1,0 +1,286 @@
+openapi: 3.1.0
+info:
+  title: Workout Tracker API
+  version: 1.0.0
+  description: Local single-user API for workout sessions and exercise catalog.
+servers:
+  - url: http://127.0.0.1:3000/api
+    description: Local loopback service; port may be configured.
+paths:
+  /exercises:
+    get:
+      summary: List the predefined exercise catalog
+      description: No query parameters are supported; unexpected query parameters are invalid input.
+      responses:
+        '200':
+          description: Catalog returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/ExerciseCatalogItem' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /sessions:
+    get:
+      summary: List sessions newest first
+      description: No query parameters are supported; unexpected query parameters are invalid input. Results are scroll-only in the UI; search and filters are out of scope.
+      responses:
+        '200':
+          description: Session summaries returned
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/SessionSummary' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+    post:
+      summary: Start a workout session
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              properties:
+                title: { type: string, minLength: 1 }
+                startedAt: { type: string, format: date-time }
+      responses:
+        '201':
+          description: Pending session created; omitted title defaults to the time-of-day label alone.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionDetail' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /sessions/{sessionId}:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    get:
+      summary: Get session details
+      responses:
+        '200':
+          description: Session detail returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionDetail' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+    patch:
+      summary: Edit a session title or start time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              minProperties: 1
+              additionalProperties: false
+              properties:
+                title: { type: string, minLength: 1 }
+                startedAt: { type: string, format: date-time }
+      responses:
+        '200':
+          description: Session updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionDetail' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+    delete:
+      summary: Delete a session and its exercise/set rows
+      responses:
+        '204': { description: Session deleted; response has no body }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /sessions/{sessionId}/complete:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      summary: Complete a Pending session
+      description: Completion is idempotent; a repeated request returns the completed session without changing its original completedAt.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { type: object, maxProperties: 0 }
+      responses:
+        '200':
+          description: Completed session returned
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionDetail' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /sessions/{sessionId}/exercises:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+    post:
+      summary: Add a catalog exercise and its sets to a Pending session
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [exerciseId, sets]
+              additionalProperties: false
+              properties:
+                exerciseId: { type: integer, minimum: 1 }
+                sets:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/SetInput' }
+      responses:
+        '201':
+          description: Exercise entry and complete set list saved atomically
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionExercise' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+  /sessions/{sessionId}/exercises/{sessionExerciseId}:
+    parameters:
+      - $ref: '#/components/parameters/SessionId'
+      - name: sessionExerciseId
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+    put:
+      summary: Replace the sets for a session exercise
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [sets]
+              additionalProperties: false
+              properties:
+                sets:
+                  type: array
+                  minItems: 1
+                  items: { $ref: '#/components/schemas/SetInput' }
+      responses:
+        '200':
+          description: Exercise sets replaced atomically
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SessionExercise' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+    delete:
+      summary: Remove an exercise entry and its sets
+      responses:
+        '204': { description: Exercise entry deleted; response has no body }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/ServerError' }
+components:
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      description: Must be a positive integer; malformed identifiers return 400.
+      schema: { type: integer, minimum: 1 }
+  responses:
+    BadRequest:
+      description: Invalid path, query, body, field value, or request state
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: A well-formed identifier does not identify the requested record
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    ServerError:
+      description: Unexpected server failure; internal details are not exposed
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    ExerciseCatalogItem:
+      type: object
+      required: [id, name, muscleGroup]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        muscleGroup:
+          type: string
+          description: Primary muscle-group metadata; returned but not displayed or used for filtering in v1.
+    SessionSummary:
+      type: object
+      required: [id, title, status, startedAt, completedAt, timeOfDayLabel]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        status: { type: string, enum: [PENDING, COMPLETED] }
+        startedAt: { type: string, format: date-time, description: ISO 8601 timestamp with UTC offset. }
+        completedAt: { type: [string, 'null'], format: date-time }
+        timeOfDayLabel:
+          type: string
+          enum: [Morning Workout, Afternoon Workout, Evening Workout, Night Workout]
+    SessionDetail:
+      allOf:
+        - { $ref: '#/components/schemas/SessionSummary' }
+        - type: object
+          required: [exercises]
+          properties:
+            exercises:
+              type: array
+              items: { $ref: '#/components/schemas/SessionExercise' }
+    SessionExercise:
+      type: object
+      required: [id, exerciseId, name, muscleGroup, orderIndex, sets]
+      properties:
+        id: { type: integer }
+        exerciseId: { type: integer }
+        name: { type: string }
+        muscleGroup: { type: string, description: Returned metadata; not presented in the v1 exercise picker. }
+        orderIndex: { type: integer, minimum: 0 }
+        sets:
+          type: array
+          minItems: 1
+          items:
+            allOf:
+              - { $ref: '#/components/schemas/SetInput' }
+              - type: object
+                required: [id]
+                properties:
+                  id: { type: integer }
+    SetInput:
+      type: object
+      required: [setNumber, weightKg, reps]
+      additionalProperties: false
+      properties:
+        setNumber: { type: integer, minimum: 1 }
+        weightKg: { type: number, minimum: 0, multipleOf: 0.1, description: Finite JSON number; no product-defined maximum. }
+        reps: { type: integer, minimum: 1 }
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
