@@ -1,0 +1,26 @@
+{
+  "name": "local-workout-tracker",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n backend,frontend -c blue,green \"npm:dev --workspace backend\" \"npm:dev --workspace frontend\"",
+    "build": "npm run build --workspace frontend",
+    "start": "npm run start --workspace backend",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "db:migrate": "npm run db:migrate --workspace backend",
+    "db:check": "npm run db:check --workspace backend",
+    "eval:parser": "node .harness/evaluate.js"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^5.1.1",
+    "concurrently": "^9.2.1",
+    "jsdom": "^26.1.0",
+    "supertest": "^7.1.4",
+    "vitest": "^5.1.1"
+  }
+}

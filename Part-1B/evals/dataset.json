@@ -1,0 +1,44 @@
+[
+  {
+    "id": "valid-three-sets",
+    "text": "I did 3 sets of chest press at 50kg for 10 reps this morning",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "parsed", "exerciseName": "Chest press machine", "sets": [{ "weightKg": 50, "reps": 10 }, { "weightKg": 50, "reps": 10 }, { "weightKg": 50, "reps": 10 }] }
+  },
+  {
+    "id": "explicit-variable-sets",
+    "text": "Chest fly: 20kg for 15, 30kg for 12, and 40kg for 10 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "parsed", "exerciseName": "Chest fly", "sets": [{ "weightKg": 20, "reps": 15 }, { "weightKg": 30, "reps": 12 }, { "weightKg": 40, "reps": 10 }] }
+  },
+  {
+    "id": "vague-chest",
+    "text": "I did some chest today",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "needs_clarification" }
+  },
+  {
+    "id": "negative-weight",
+    "text": "I did chest press for 10 reps at -5kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "INVALID_WEIGHT" }
+  },
+  {
+    "id": "unsupported-exercise",
+    "text": "I did pec deck machine for 3 sets of 20kg for 12 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNSUPPORTED_EXERCISE" }
+  },
+  {
+    "id": "missing-reps",
+    "text": "I did chest fly for 3 sets at 25kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "needs_clarification" }
+  }
+]
