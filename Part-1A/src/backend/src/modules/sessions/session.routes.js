@@ -47,7 +47,9 @@ export function sessionRouter(service) {
       const input = validateExerciseInput(req.body);
       const result = service.addExercise(sessionId, input.exerciseId, input.sets);
       if (result.missing === 'session') throw new HttpError(404, 'NOT_FOUND', 'Session not found');
-      if (result.missing === 'exercise') throw new HttpError(404, 'NOT_FOUND', 'Exercise not found');
+      // A well-formed exercise entry that references an ID outside the
+      // predefined catalog is invalid client input, like invalid set values.
+      if (result.missing === 'exercise') throw new HttpError(400, 'INVALID_EXERCISE', 'Exercise is not in the predefined catalog');
       if (result.completed) throw new HttpError(400, 'SESSION_COMPLETED', 'Completed sessions cannot be changed');
       res.status(201).json(result.exercise);
     } catch (error) { next(error); }
