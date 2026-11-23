@@ -34,16 +34,25 @@ export function createLlmProvider(config, fetchImpl = fetch) {
           headers: { 'x-goog-api-key': config.llmApiKey, 'Content-Type': 'application/json' },
           signal: AbortSignal.timeout(config.llmTimeoutMs),
           body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: `${prompt}\n\nWorkout sentence:\n${text}` }] }],
-            generationConfig: { temperature: 0, responseMimeType: 'application/json' },
+            system_instruction: { parts: [{ text: prompt }] },
+            contents: [{ role: 'user', parts: [{ text }] }],
+            generationConfig: {
+              temperature: 0,
+              responseMimeType: 'application/json'
+            }
           }),
           });
         }
       } catch {
-        throw providerError('The workout parser could not reach the configured LLM. Try again or log manually.', 502, 'LLM_PROVIDER_ERROR');
+        throw providerError('The workout parser could not reach the configured LLM. Check the backend network connection and try again.', 502, 'LLM_PROVIDER_UNREACHABLE');
       }
-      if (!response.ok) throw providerError('The workout parser could not reach the configured LLM. Try again or log manually.', 502, 'LLM_PROVIDER_ERROR');
-      const payload = await response.json();
+      if (!response.ok) {
+        console.error(`LLM provider ${config.llmProvider} returned HTTP ${response.status} for model ${config.llmModel}`);
+        throw providerError(`The configured LLM rejected the request (HTTP ${response.status}). Check the backend provider, model, and API key settings.`, 502, 'LLM_PROVIDER_REJECTED');
+      }
+      let payload;
+      try { payload = await response.json(); }
+      catch { throw providerError('The configured LLM returned an invalid response. Try again or log manually.', 502, 'LLM_INVALID_RESPONSE'); }
       const content = config.llmProvider === 'openai'
         ? payload?.choices?.[0]?.message?.content
         : payload?.candidates?.[0]?.content?.parts?.map((part) => part.text ?? '').join('');

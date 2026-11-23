@@ -17,6 +17,7 @@ export function loadConfig(env = process.env) {
     llmApiKey: env.LLM_API_KEY ?? '',
     openAiBaseUrl: (env.OPENAI_BASE_URL ?? 'https://api.openai.com/v1').replace(/\/$/, ''),
     geminiBaseUrl: (env.GEMINI_BASE_URL ?? 'https://generativelanguage.googleapis.com/v1beta').replace(/\/$/, ''),
+    llmEndpoint: (env.LLM_ENDPOINT ?? '').replace(/\/$/, ''),
     llmTimeoutMs: Number(env.LLM_TIMEOUT_MS ?? 20000),
   };
 }

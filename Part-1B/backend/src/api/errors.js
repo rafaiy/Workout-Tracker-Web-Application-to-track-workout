@@ -8,8 +8,14 @@ export function notFoundHandler(_req, res) {
 
 export function errorHandler(err, _req, res, _next) {
   const status = Number.isInteger(err.status) ? err.status : 500;
-  const code = status >= 500 ? 'INTERNAL_ERROR' : (err.code ?? 'REQUEST_ERROR');
-  const message = status >= 500 ? 'Something went wrong. Try again.' : err.message;
-  const details = status >= 500 ? [] : (err.details ?? []);
+  // Provider/configuration errors already have safe, actionable messages. Keep
+  // those intact; only hide details for unexpected server errors.
+  const expectedUpstreamError = status >= 500 && status < 600
+    && typeof err.code === 'string'
+    && (err.code.startsWith('LLM_') || err.code === 'UPSTREAM_ERROR');
+  const unexpectedServerError = status >= 500 && !expectedUpstreamError;
+  const code = unexpectedServerError ? 'INTERNAL_ERROR' : (err.code ?? 'REQUEST_ERROR');
+  const message = unexpectedServerError ? 'Something went wrong. Try again.' : err.message;
+  const details = unexpectedServerError ? [] : (err.details ?? []);
   res.status(status).json(errorBody(code, message, details));
 }
