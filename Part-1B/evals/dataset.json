@@ -40,5 +40,193 @@
     "timeZone": "Asia/Kolkata",
     "submittedAt": "2026-11-23T18:00:00+05:30",
     "expected": { "outcome": "needs_clarification" }
+  },
+  {
+    "id": "zero-weight",
+    "text": "I did chest press for 10 reps at 0kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "INVALID_WEIGHT" }
+  },
+  {
+    "id": "minimum-weight",
+    "text": "I did chest press for 10 reps at 0.1kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "INVALID_WEIGHT" }
+  },
+  {
+    "id": "one-rep",
+    "text": "I did chest press for 1 rep at 20kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "INVALID_REPS" }
+  },
+  {
+    "id": "zero-reps",
+    "text": "I did chest press for 0 reps at 20kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "INVALID_REPS" }
+  },
+  {
+    "id": "missing-weight",
+    "text": "I did 3 sets of chest press for 10 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "needs_clarification" }
+  },
+  {
+    "id": "missing-set-details",
+    "text": "I did chest press at 20kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "needs_clarification" }
+  },
+  {
+    "id": "biceps-curl-extreme-load",
+    "text": "I did biceps curls for 5 reps at 1000kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "biceps-curl-high-load-low-reps",
+    "text": "I did biceps curls for 3 reps at 80kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "biceps-curl-moderate-load",
+    "text": "I did biceps curls for 8 reps at 20kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": {
+      "outcome": "parsed",
+      "exerciseName": "Biceps curl",
+      "sets": [{ "weightKg": 20, "reps": 8 }]
+    }
+  },
+  {
+    "id": "deadlift-240kg-five-reps",
+    "text": "I deadlifted 240kg for 5 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": {
+      "outcome": "parsed",
+      "exerciseName": "Deadlift",
+      "sets": [{ "weightKg": 240, "reps": 5 }]
+    }
+  },
+  {
+    "id": "deadlift-240kg-twenty-five-reps",
+    "text": "I deadlifted 240kg for 25 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD_REPS" }
+  },
+  {
+    "id": "deadlift-extreme-load",
+    "text": "I did 1 deadlift rep at 1000kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "bench-press-heavy-single",
+    "text": "I bench pressed 180kg for 1 rep",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": {
+      "outcome": "parsed",
+      "exerciseName": "Bench press",
+      "sets": [{ "weightKg": 180, "reps": 1 }]
+    }
+  },
+  {
+    "id": "bench-press-heavy-high-reps",
+    "text": "I bench pressed 180kg for 25 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD_REPS" }
+  },
+  {
+    "id": "bench-press-extreme-load",
+    "text": "I bench pressed 1000kg for 1 rep",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "squat-heavy-single",
+    "text": "I squatted 300kg for 1 rep",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": {
+      "outcome": "parsed",
+      "exerciseName": "Barbell squat",
+      "sets": [{ "weightKg": 300, "reps": 1 }]
+    }
+  },
+  {
+    "id": "squat-heavy-high-reps",
+    "text": "I squatted 300kg for 25 reps",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD_REPS" }
+  },
+  {
+    "id": "squat-extreme-load",
+    "text": "I did 1 squat rep at 1000kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "lateral-raise-extreme-load",
+    "text": "I did lateral raises for 8 reps at 100kg per dumbbell",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "lateral-raise-reasonable-load",
+    "text": "I did lateral raises for 12 reps with 8kg dumbbells",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": {
+      "outcome": "parsed",
+      "exerciseName": "Lateral raise",
+      "sets": [{ "weightKg": 8, "reps": 12 }]
+    }
+  },
+  {
+    "id": "chest-fly-machine-extreme-load",
+    "text": "I did chest fly machine for 10 reps at 500kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "leg-extension-extreme-load",
+    "text": "I did leg extensions for 10 reps at 500kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
+  },
+  {
+    "id": "calf-raise-heavy-high-reps",
+    "text": "I did standing calf raises for 100 reps at 300kg",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T06:30:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD_REPS" }
+  },
+  {
+    "id": "push-up-load-impossible",
+    "text": "I did push-ups for 10 reps with 500kg added weight",
+    "timeZone": "Asia/Kolkata",
+    "submittedAt": "2026-11-23T18:00:00+05:30",
+    "expected": { "outcome": "rejected", "code": "UNREALISTIC_LOAD" }
   }
 ]
